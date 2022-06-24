@@ -1,0 +1,32 @@
+#!/bin/sh
+# ARCHIVE - A tool for chronicling.
+
+[[ -d $HOME/.archives ]] || mkdir $HOME/.archives/
+archive=$1
+shift
+ap=$HOME/.archives/$archive
+
+while getopts ":rcem:" opt; do
+    case "${opt}" in
+	c)
+		[[ -f $ap ]] || echo "[Archive \"$archive\". Options:]" > $ap
+	;;
+	r)
+		[[ -f $ap ]] && cat $ap || echo "Archive \"$archive\" doesn't exist; Create it by specifing '-c'" && exit 1
+	;;
+	e)
+		$EDITOR /tmp/"$archive"_entry && OPTARG=$(cat /tmp/"$archive"_entry) && rm /tmp/"$archive"_entry
+		;&
+	m)
+
+		[[ -f $ap ]] && echo "$OPTARG" >> $ap || (echo "Archive \"$archive\" doesn't exist; Create it with -c" && exit 1)
+		head $ap -n 1 | grep "NO_TIME" -q && cat $ap | sed "/$(date +'%A, %B %d, %Y')/d" > $ap 
+		head $ap -n 1 | grep "NO_DATE" -q && echo "NO_DATE specified" || printf "$(date +'%A, %B %d, %Y')" >> $ap
+		head $ap -n 1 | grep "NO_TIME" -q && echo "NO_TIME specified" || echo ", at $(date +'%l:%S%p')" >> $ap
+		echo -e '\n' >> $ap
+	;;
+	*)
+	echo "Unknown option"
+	;;
+    esac
+done
