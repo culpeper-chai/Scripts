@@ -6,7 +6,7 @@ archive=$1
 shift
 ap=$HOME/.archives/$archive
 
-while getopts ":rcem:" opt; do
+while getopts ":hrcem:" opt; do
     case "${opt}" in
 	c)
 		[[ -f $ap ]] || echo "[Archive \"$archive\". Options:]" > $ap
@@ -25,6 +25,15 @@ while getopts ":rcem:" opt; do
 		head $ap -n 1 | grep "NO_TIME" -q && echo "NO_TIME specified" || echo ", at $(date +'%l:%S%p')" >> $ap
 		echo -e '\n' >> $ap
 	;;
+	h)
+		echo "ARCHIVE - a tool for chronicling"
+		echo "SYNTAX: record [ARCHIVE NAME] [OPTIONS] [OPTARGS]"
+		echo "ARCHIVE (a.k.a 'record') is a tool that appends a message to a file (called an archive), as well as creates or reads that file."
+		echo "OPTIONS: "
+		echo "'-c': creates the specified archive"
+		echo "'-m [MESSAGE]': appends the specified message to the archive"
+		echo "'-e': the same as '-m', except instead of taking the message as an argument, it allows the user to write the messsage in the system's default editor"
+		echo "'-r': prints the contents of the archive"
 	*)
 	echo "Unknown option"
 	;;
