@@ -1,0 +1,41 @@
+#!/bin/sh
+# ARCHIVE - A tool for chronicling.
+
+[[ -d $HOME/.archives ]] || mkdir $HOME/.archives/
+archive=$1
+shift
+ap=$HOME/.archives/$archive
+
+while getopts ":hrcem:" opt; do
+    case "${opt}" in
+	c)
+		[[ -f $ap ]] || echo "[Archive \"$archive\". Options:]" > $ap
+	;;
+	r)
+		[[ -f $ap ]] && cat $ap || echo "Archive \"$archive\" doesn't exist; Create it by specifing '-c'" && exit 1
+	;;
+	e)
+		$EDITOR /tmp/"$archive"_entry && OPTARG=$(cat /tmp/"$archive"_entry) && rm /tmp/"$archive"_entry
+		;&
+	m)
+
+		[[ -f $ap ]] && echo "$OPTARG" >> $ap || (echo "Archive \"$archive\" doesn't exist; Create it with -c" && exit 1)
+		head $ap -n 1 | grep "NO_TIME" -q && cat $ap | sed "/$(date +'%A, %B %d, %Y')/d" > $ap 
+		head $ap -n 1 | grep "NO_DATE" -q && echo "NO_DATE specified" || printf "$(date +'%A, %B %d, %Y')" >> $ap
+		head $ap -n 1 | grep "NO_TIME" -q && echo "NO_TIME specified" || echo ", at $(date +'%l:%S%p')" >> $ap
+		echo -e '\n' >> $ap
+	;;
+	h)
+		echo "ARCHIVE - a tool for chronicling"
+		echo "SYNTAX: record [ARCHIVE NAME] [OPTIONS] [OPTARGS]"
+		echo "ARCHIVE (a.k.a 'record') is a tool that appends a message to a file (called an archive), as well as creates or reads that file."
+		echo "OPTIONS: "
+		echo "'-c': creates the specified archive"
+		echo "'-m [MESSAGE]': appends the specified message to the archive"
+		echo "'-e': the same as '-m', except instead of taking the message as an argument, it allows the user to write the messsage in the system's default editor"
+		echo "'-r': prints the contents of the archive"
+	*)
+	echo "Unknown option"
+	;;
+    esac
+done
