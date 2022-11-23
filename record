@@ -16,7 +16,6 @@ while getopts ":hrcem:" opt; do
 	;;
 	e)
 		$EDITOR /tmp/"$archive"_entry && OPTARG=$(cat /tmp/"$archive"_entry) && rm /tmp/"$archive"_entry
-		;&
 	m)
 
 		[[ -f $ap ]] && echo "$OPTARG" >> $ap || (echo "Archive \"$archive\" doesn't exist; Create it with -c" && exit 1)
@@ -34,8 +33,6 @@ while getopts ":hrcem:" opt; do
 		echo "'-m [MESSAGE]': appends the specified message to the archive"
 		echo "'-e': the same as '-m', except instead of taking the message as an argument, it allows the user to write the messsage in the system's default editor"
 		echo "'-r': prints the contents of the archive"
-	*)
-	echo "Unknown option"
 	;;
     esac
 done
